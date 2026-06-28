@@ -77,6 +77,37 @@ public class EquipmentDAO {
         return e;
     }
 
+    public EquipmentBean getMostRentedEquipment() throws SQLException {
+        String sql = "SELECT e.*, COUNT(r.RentalID) AS TotalRental " +
+                     "FROM Equipment e " +
+                     "JOIN Rentals r ON e.EquipmentID = r.EquipmentID " +
+                     "GROUP BY e.EquipmentID, e.EquipmentName, e.EquipmentType, " +
+                     "e.ConditionStatus, e.PricePerDay, e.AvailabilityStatus " +
+                     "ORDER BY TotalRental DESC FETCH FIRST 1 ROW ONLY";
+
+        Connection con = DBConnection.getConnection();
+        PreparedStatement ps = con.prepareStatement(sql);
+        ResultSet rs = ps.executeQuery();
+
+        EquipmentBean e = null;
+
+        if (rs.next()) {
+            e = new EquipmentBean();
+            e.setEquipmentID(rs.getInt("EquipmentID"));
+            e.setEquipmentName(rs.getString("EquipmentName"));
+            e.setEquipmentType(rs.getString("EquipmentType"));
+            e.setConditionStatus(rs.getString("ConditionStatus"));
+            e.setPricePerDay(rs.getBigDecimal("PricePerDay"));
+            e.setAvailabilityStatus(rs.getBoolean("AvailabilityStatus"));
+        }
+
+        rs.close();
+        ps.close();
+        con.close();
+
+        return e;
+    }
+
     public void updateEquipment(EquipmentBean equipment) throws SQLException {
         String sql = "UPDATE Equipment SET EquipmentName=?, EquipmentType=?, ConditionStatus=?, PricePerDay=?, AvailabilityStatus=? WHERE EquipmentID=?";
 
