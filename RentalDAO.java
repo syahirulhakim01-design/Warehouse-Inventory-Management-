@@ -84,6 +84,34 @@ public class RentalDAO {
         return list;
     }
 
+    public List<RentalBean> getActiveRental() throws SQLException {
+        List<RentalBean> list = new ArrayList<>();
+        String sql = "SELECT * FROM Rentals WHERE Status='Active'";
+
+        Connection con = DBConnection.getConnection();
+        PreparedStatement ps = con.prepareStatement(sql);
+        ResultSet rs = ps.executeQuery();
+
+        while (rs.next()) {
+            RentalBean r = new RentalBean();
+            r.setRentalID(rs.getInt("RentalID"));
+            r.setCustomerID(rs.getInt("CustomerID"));
+            r.setEmployeeID(rs.getInt("EmployeeID"));
+            r.setEquipmentID(rs.getInt("EquipmentID"));
+            r.setStartDate(rs.getDate("StartDate"));
+            r.setEndDate(rs.getDate("EndDate"));
+            r.setStatus(rs.getString("Status"));
+            r.setTotalAmount(rs.getBigDecimal("TotalAmount"));
+            list.add(r);
+        }
+
+        rs.close();
+        ps.close();
+        con.close();
+
+        return list;
+    }
+
     public void updateRentalStatus(int rentalID, String status, int employeeID) throws SQLException {
         String sql = "UPDATE Rentals SET Status=?, EmployeeID=? WHERE RentalID=?";
 
