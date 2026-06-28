@@ -50,6 +50,34 @@ public class MaintenanceDAO {
         return list;
     }
 
+    public List<MaintenanceBean> getMaintenanceByEmployee(int employeeID) throws SQLException {
+        List<MaintenanceBean> list = new ArrayList<>();
+        String sql = "SELECT * FROM Maintenance WHERE EmployeeID=?";
+
+        Connection con = DBConnection.getConnection();
+        PreparedStatement ps = con.prepareStatement(sql);
+        ps.setInt(1, employeeID);
+
+        ResultSet rs = ps.executeQuery();
+
+        while (rs.next()) {
+            MaintenanceBean m = new MaintenanceBean();
+            m.setMaintenanceID(rs.getInt("MaintenanceID"));
+            m.setEmployeeID(rs.getInt("EmployeeID"));
+            m.setEquipmentID(rs.getInt("EquipmentID"));
+            m.setIssue(rs.getString("Issue"));
+            m.setRepairDate(rs.getDate("RepairDate"));
+            m.setStatus(rs.getString("Status"));
+            list.add(m);
+        }
+
+        rs.close();
+        ps.close();
+        con.close();
+
+        return list;
+    }
+
     public void updateMaintenanceStatus(int maintenanceID, String status) throws SQLException {
         String sql = "UPDATE Maintenance SET Status=? WHERE MaintenanceID=?";
 
